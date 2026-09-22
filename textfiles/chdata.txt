@@ -1,0 +1,8 @@
+13.05.2026 23:07:48
+{
+    "Wasteland [RBW]": 181129.53,
+    "Silocides [IIPI]": 104724.97,
+    "ao ABGEHOBEN... [ABG-]": 261724.76,
+    "Den of Dragons [-DEN]": 175448.68,
+    "Dont Panic [+ 42+]": 222309.86
+}

@@ -20,6 +20,7 @@ allQuests = [
     'campain7times', 
     'increaseChampLevel3times', 
     'artUpdate4times', 
+    'updateChampInTavern'
     ]
 
 # For those quests that are not repeated everyday
@@ -29,17 +30,31 @@ def main():
     if (shared.readyToRun('dailyquests')):
         print("Starting daily quests")
         scanAvailableQuests()
-        summon3champions()        
+        summon3champions()     
+        updateChampInTavern()   
         doScannedQuests()
     if (shared.readyToRun('dailyadvrewards', 6)):
         return collectedAdvancedDaily()
     return False
 
+def updateChampInTavern():
+    print("updating champion with brew")
+    #open tavern
+    shared.clickWrap('tavern')
+    shared.clickWrap('sorting')
+    shared.clickBelow('tavern_below_filter', 50) #pick champion
+    shared.clickBelow('tavern_below_filter', 50) #pick brew
+    shared.clickWrap('tavern_update')
+    shared.clickWrap('tavern_close')
+    closeadds.closeAdds()
+
 def campain7times():
     shared.clickWrap('battle')
-    shared.clickWrap('campain_quick_brimstone_path')
+    #shared.clickWrap('campain_quick_brimstone_path') # uncomment for brutal
+    shared.clickWrap('campain_quick_brimstone_path_NORMAL')
     shared.clickWrap('close_arena')
-    shared.clickToTheRight('brimstone_path_stage3')
+    #shared.clickToTheRight('brimstone_path_stage3') # uncomment for brutal
+    shared.clickToTheRight('brimstone_path_stage3_NORMAL')
     shared.clickWrap('start_dungeon')
     campain.campainRepeat(6)
     shared.clickWrap('bastion')
@@ -60,9 +75,11 @@ def summon3champions():
     
 def campainBoss3times():
     shared.clickWrap('battle')
-    shared.clickWrap('campain_quick_brimstone_path')
+    #shared.clickWrap('campain_quick_brimstone_path') # uncomment for brutal
+    shared.clickWrap('campain_quick_brimstone_path_NORMAL')
     shared.clickWrap('close_arena')
-    shared.clickToTheRight('brimstone_path_stage7')
+    #shared.clickToTheRight('brimstone_path_stage7') # uncomment for brutal
+    shared.clickToTheRight('brimstone_path_stage7_NORMAL')
     shared.clickWrap('start_dungeon')
     campain.campainRepeat(2)
     shared.clickWrap('bastion')
@@ -198,4 +215,6 @@ def collectDailyQuestEnergy():
 
 if __name__ == "__main__":
     main()
-
+    #campain7times()
+    #campainBoss3times()
+    #updateChampInTavern()

@@ -12,6 +12,9 @@ def closeAdds():
     for i in range(4):
         time.sleep(1)
         forge = pyautogui.locateOnScreen('./bilder/forge.PNG', grayscale = False, confidence = 0.98)
+        #forge = pyautogui.locateOnScreen('./bilder/forge_aniversary.PNG', grayscale = False, confidence = 0.98)
+        #forge = pyautogui.locateOnScreen('./bilder/forge_halloween.PNG', grayscale = False, confidence = 0.98)
+        #forge = pyautogui.locateOnScreen('./bilder/forge_xmas.PNG', grayscale = False, confidence = 0.98)
         if(forge):
             print("No adds detected")
         else:

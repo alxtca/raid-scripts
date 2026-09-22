@@ -6,7 +6,12 @@ import closeadds
 
 def upgradeChampions():
     print("upgradeChampions. Checking if upgrade required...")
-    result = pyautogui.locateOnScreen('./bilder/guardian_ring_new.PNG', grayscale = False, confidence = 0.99)
+    # result = pyautogui.locateOnScreen('./bilder/guardian_ring_new.PNG', grayscale = False, confidence = 0.99)
+    result = pyautogui.locateOnScreen('./bilder/guardian_ring_new_oz_even.PNG', grayscale = False, confidence = 0.99)
+    # result = pyautogui.locateOnScreen('./bilder/guardian_ring_aniversary_7.PNG', grayscale = False, confidence = 0.99)
+    #result = pyautogui.locateOnScreen('./bilder/guardian_ring_6th_aniversary.PNG', grayscale = False, confidence = 0.99)
+    #result = pyautogui.locateOnScreen('./bilder/guardian_ring_new_xmas.PNG', grayscale = False, confidence = 0.99)
+    #result = pyautogui.locateOnScreen('./bilder/guardian_ring_new_halloween.PNG', grayscale = False, confidence = 0.99)
     if(result):
         print("guardian ring - training finished")
         pyautogui.click(result)

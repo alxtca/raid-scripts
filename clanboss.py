@@ -3,18 +3,19 @@ import pyautogui
 import time
 from datetime import datetime, timedelta
 import closeadds
+import errorhandling
 
 
-def unm():
-    __cbSelected('unm')
+cb = ['unm', 'nm', 'brutal', 'hard']
+#cb = ['unm', 'nm', 'brutal']
 
-def nm():
-    __cbSelected('nm')
-
-def brutal():
-    __cbSelected('brutal')
+def main():
+    for i in cb:
+        __cbSelected(i)
 
 def __cbSelected(cb_difficulty):
+    if (errorhandling.gameReset()  == 'skip'):
+        return
     file_path = f'./textfiles/{cb_difficulty}.txt'
     print("starting clan boss run for ", file_path)
     ready_to_run: bool = __ready_to_run_cb(file_path) #was did_run_today
@@ -24,7 +25,8 @@ def __cbSelected(cb_difficulty):
         if __hasKeys():#key check here. What happens when there is no key, why it does write execution????
             __initFight(cb_difficulty)
             __write_execution_status(file_path)
-        __finilizeCB()
+            __finilizeCNrun
+        __finilizeCB() # need changes here
     else:
         print("execution status / ready to run ", ready_to_run)
 
@@ -52,6 +54,15 @@ def __initCB():
     shared.clickWrap('battle')
     shared.clickWrap('clan')
 
+def __finilizeCNrun():
+    while(True):
+        result = pyautogui.locateOnScreen('./bilder/clanboss_result.PNG', grayscale = True, confidence = 0.95)
+        if(result):
+            shared.clickWrap('clanboss_continue')
+            break
+    shared.clickWrap('close_arena')
+    shared.clickWrap('close_arena')
+
 def __finilizeCB():
     shared.clickWrap('bastion', 3600)
     closeadds.closeAdds()
@@ -68,7 +79,7 @@ def __claimRewards():
 # zero Keys - True
 def __hasKeys():
     time.sleep(2)
-    if (pyautogui.locateOnScreen('./bilder/0cb_key.PNG', grayscale = True, confidence = 0.99)):
+    if (pyautogui.locateOnScreen('./bilder/0cb_key.PNG', grayscale = True, confidence = 0.99, minSearchTime=3)):
         print("zero CB keys")
         return False
     return True
@@ -98,14 +109,14 @@ def __ready_to_run_cb(file_path, current_time=None):
             execution_datetime_str = file.read().strip()
             executed_last_time = datetime.strptime(execution_datetime_str, "%d.%m.%Y %H:%M:%S")
             current_datetime = current_time or datetime.now()
-            if current_datetime.hour >= 12 and (current_datetime.hour > 12 or current_datetime.minute >= 15):
+            if current_datetime.hour >= 13 and (current_datetime.hour > 13 or current_datetime.minute >= 15):
                 current_time_frame_start = datetime(
-                    current_datetime.year, current_datetime.month, current_datetime.day, 12, 15, 0
+                    current_datetime.year, current_datetime.month, current_datetime.day, 13, 15, 0
                 )
             else:
                 previous_day = current_datetime - timedelta(days=1)
                 current_time_frame_start = datetime(
-                    previous_day.year, previous_day.month, previous_day.day, 12, 15, 0
+                    previous_day.year, previous_day.month, previous_day.day, 13, 15, 0
                 )
             time_frame_end = current_time_frame_start + timedelta(days=1) - timedelta(minutes=20) - timedelta(seconds=1)
             print("current_time_frame_start ", current_time_frame_start)
@@ -119,8 +130,36 @@ def __ready_to_run_cb(file_path, current_time=None):
                 return True
     except FileNotFoundError:
         return False
+    
+
+def __ready_to_run(file_path, current_time=None):
+    try:
+        with open(file_path, 'r') as file:
+            execution_datetime_str = file.read().strip()
+            executed_last_time = datetime.strptime(execution_datetime_str, "%d.%m.%Y %H:%M:%S")
+            current_datetime = current_time or datetime.now()
+            if current_datetime.hour >= 12 and (current_datetime.hour > 12 or current_datetime.minute >= 15):
+                current_time_frame_start = datetime(
+                    current_datetime.year, current_datetime.month, current_datetime.day, 12, 15, 0
+                )
+            else:
+                previous_day = current_datetime - timedelta(days=1)
+                current_time_frame_start = datetime(
+                    previous_day.year, previous_day.month, previous_day.day, 12, 15, 0
+                )
+            time_frame_end = current_time_frame_start + timedelta(days=1) - timedelta(minutes=20) - timedelta(seconds=1)
+            if current_time_frame_start <= executed_last_time <= time_frame_end:
+                print("Allready did today")
+                return False
+            else:
+                print("Ready to run")
+                return True
+    except FileNotFoundError:
+        return False
 
 
 
 if __name__ == "__main__":
-    print("main clanboss")
+    main()
+    #__hasKeys()
+    #__claimRewards()

@@ -10,81 +10,61 @@ import dungeon
 import arena
 import doomtower
 from cb import ready_to_run_cb
+import pydirectinput
 
+import cv2
+import numpy as np
 
-#result = checkCounter()
-#print(result)
+time.sleep(1)
 
-# open the file using open() function
-#file = open("sample.txt", 'r') #  file.read() - read content        file.write("") - not writable
-#file = open("sample.txt", 'r+') #  file.read() - read content        file.write("") - append 
-#file = open("sample.txt", 'w') #  file.read() - error not readable  file.write("") - replaces
-#file = open("sample.txt", 'w+') # file.read() - read nothing        file.write("") - replaces
-#file = open("sample.txt", 'a') #  file.read() - error not readable  filr.write("") - append;      
-#file = open("sample.txt", 'a+') # file.read() - read nothing        file.write("") - appends 
+# step 1
+# insted of reading picture from file, work with the screen
+# ALT
+# take a screenshot, and work with that.
 
+# step 2
+# extract coordinates from this process and use coordinates to make the click
 
-#print(readyToRunPart2('factionwars2'))
+# read game image (image of the game)
+# in my case I don't have image, I rather need coordinate of the screen
 
-# 1. when to collect
-# 2. forgot about "collected": bool
+# but just to verify this thing is working Ill take a screeen shot
+#img = cv2.imread('bilder/game_market.png')
+pyautogui.screenshot('screenshot_test.png')
+img = cv2.imread('screenshot_test.png')
 
+# read bananas image template
+template = cv2.imread('bilder/market_uncommon_39000_transparent.png', cv2.IMREAD_UNCHANGED)
+hh, ww = template.shape[:2]
 
-# Imagine the cycle
-# step 1 - collect adv rewards
-#     if (shared.readyToRun('dailyadvrewards', 7)):
-            #collectedAdvancedDaily()
+# extract bananas base image and alpha channel and make alpha 3 channels
+base = template[:,:,0:3]
+alpha = template[:,:,3]
+alpha = cv2.merge([alpha,alpha,alpha])
 
-# step 2 - if collected - (check date is today)
-# run factionwars again ( normally will happen same day but several hours later)
-    # update factionwars2.txt {"date": "2023-05-28T14:04:35"}
+# do masked template matching and save correlation image
+correlation = cv2.matchTemplate(img, base, cv2.TM_CCORR_NORMED, mask=alpha)
 
-def brutal():
-    __cbSelected('brutal')
+# set threshold and get all matches
+threshhold = 0.95
+loc = np.where(correlation >= threshhold)
 
-def __cbSelected(cb_difficulty):
-    file_path = f'./textfiles/{cb_difficulty}.txt'
-    print("starting clan boss run for ", file_path)
-    execution_status = __ready_to_run_cb(file_path) #was did_run_today
-    print("execution status: ", execution_status)
-    if execution_status:
-        __write_execution_status(file_path)
+#print("loc ", loc) # these are coordinates on the picture
 
-def __write_execution_status(file_path):
-    current_datetime = datetime.now().strftime("%d.%m.%Y %H:%M:%S")
-    with open(file_path, 'w') as file:
-        file.write(current_datetime)
+# draw matches 
+result = img.copy()
+for pt in zip(*loc[::-1]):
+    cv2.rectangle(result, pt, (pt[0]+ww, pt[1]+hh), (0,0,255), 1)
+    print(pt)
 
-def __ready_to_run_cb(file_path, current_time=None):
-    try:
-        with open(file_path, 'r') as file:
-            execution_datetime_str = file.read().strip()
-            executed_last_time = datetime.strptime(execution_datetime_str, "%d.%m.%Y %H:%M:%S")
-            current_datetime = current_time or datetime.now()
-            if current_datetime.hour >= 12:
-                current_time_frame_start = datetime(
-                    current_datetime.year, current_datetime.month, current_datetime.day, 12, 0, 0
-                )
-            else:
-                previous_day = current_datetime - timedelta(days=1)
-                current_time_frame_start = datetime(
-                    previous_day.year, previous_day.month, previous_day.day, 12, 0, 0
-                )
-            time_frame_end = current_time_frame_start + timedelta(days=1) - timedelta(seconds=1)
-            if current_time_frame_start <= executed_last_time <= time_frame_end:
-                print("Allready did run today")
-                return False
-            else:
-                print("Ready to run")
-                return True
-    except FileNotFoundError:
-        return False
+# save results
+cv2.imwrite('bananas_base2.png', base)
+cv2.imwrite('bananas_alpha2.png', alpha)
+cv2.imwrite('game_bananas_matches2.jpg', result)
 
-
-while(True):
-    clanboss.unm()
-    clanboss.nm()
-    clanboss.brutal()
-    time.sleep(15)
-#clanboss.test_write_brutal()
+#cv2.imshow('base',base)
+#cv2.imshow('alpha',alpha)
+#cv2.imshow('result',result)
+#cv2.waitKey(0)
+#cv2.destroyAllWindows()
 

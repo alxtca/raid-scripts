@@ -12,102 +12,75 @@ import arena
 import guardianring
 import market
 import factionwars
+import arenalive
+from flags import flagInstance
+import errorhandling
+from errorhandling import errorManager, unfinishedBattleCheck
+import datetime
+import chimeraclash
+import hydraclash
+import chimera
+from chimera import Mode
+import shared
+
 
 # This will
 # run dungeons, arena, update units, etc...
 # runs until stopped
 # works only on resolution - 1024x768
 
-#normal_cycle = False # Else intensive(run dungeon more frequent)
-normal_cycle = True
-intensive_cylce_rounds_left = 50
-do_tag_team_arena = True # This can be automatically turned off on CVC days
-do_faction_run2 = False
-
-def normalCycle():
-    guardianring.upgradeChampions()
-    arena.classic()
-    if(do_tag_team_arena):
-        arena.tagTeam()
-    guardianring.upgradeChampions()
-    arena.classic()
-    if(do_tag_team_arena):
-        arena.tagTeam()
+# restart is managed inside errorhandling
 
 while(True):
-    #collectgems.collectgems() - need a rework
+    # TODO: make a global swither for main theme in stronghold: x-mas, halloween, etc...
+    # 'is_halloween' png
+    # it can automatically check what theam is it and apply it
+    # buy items in bazaar
+
+    print("cvcIncoming ", shared.cvcIncoming(True))
+    #flagInstance.no_cvc = True # manual override
+
+    print("Fresh start")
+    errorManager.did_reset = False
+    errorManager.error_detected = False
+    closeadds.closeAdds()
+    if(unfinishedBattleCheck() == 'detected'):
+        closeadds.closeAdds()
+    
+    market.buyShards(False)
     guardianring.upgradeChampions()
-    market.buyShards()
-    clanboss.unm()
-    clanboss.nm()
-    clanboss.brutal()
+    collectgems.main()
+    dailyquests.main()
 
-    #TODO: dollecting daily advanced quests - will not open on correct tab tomorrow?!?!?
-    do_faction_run2 = dailyquests.main() # includes advanced quest collection
-    factionwars.main(do_faction_run2) # includes run2
-    doomtower.mainBossRepeat(15) #- OBS: if last fight wasn't boss, boss picture is hidden somewhat
+    dungeon.ironTwins()
+    dungeon.icegolem() # TODO: make dungeon.main() that accept ENUM SPIDER | DRAGON | FK | MINO | EVENT | SD | SHOGUN | IRONTWINS | POTIONKEEP
+    #dungeon.spider()
+    #dungeon.dragon()
+    #dungeon.fireknight()
+    #dungeon.minotaur()
+    #dungeon.eventDungeon()
+    #dungeon.sanddevil()
+    #dungeon.shogun()
 
-    #if dailyquests.collectPlaytimeRewards():
-    #    normal_cycle = False
-    #    print("Intensive cycle activated")
-    
-    # collect energy from daily quests
+    factionwars.main() 
+    clanboss.main()
+    doomtower.main()
 
-    # advanced quests not possible ... yet
+    #chimeraclash.main()
+    #hydraclash.main()
+    #chimera.main(Mode.PUSH)
 
-    if(normal_cycle):
-        s = 1
-        d = 1
-        f = 1
-        m = 1
-        g = 1
-        arcane_keep = 1
-        force_keep = 1
-        magic_keep = 1
-    else:
-        s = 5
-        d = 2
-        f = 2
-        m = 9
-        g = 3
-        arcane_keep = 2
-        force_keep = 5
-        magic_keep = 3
-    #dungeon.icegolem(g) # TypeError: cannot unpack non-iterable NoneType object
-    dungeon.spider(s)
-    #dungeon.dragon(d) # exp 289/e  (12-3 1081/e)
-    #ungeon.fireknight(f) # 354/e stage 20
-    #dungeon.minotaur(m)
+    arenalive.main()
+    arena.tagTeam("2026-09-16")
+    arena.classic() 
 
-    #dungeon.arcaneKeep(arcane_keep)
-    #dungeon.forceKeep(force_keep)
-    #dungeon.magicKeep(magic_keep)
+    #dungeon.arcaneKeep()
+    #dungeon.forceKeep()
+    #dungeon.magicKeep()
+    #dungeon.spiritKeep()
     #dungeon.voidKeep()
-
-    #IRON TWINS () todo
-
-    #######fix this - farmcampain.farm(2)
-
-    if(intensive_cylce_rounds_left > 0 and normal_cycle == False):
-        intensive_cylce_rounds_left -= 1
-        print("Intensive rounds left ", intensive_cylce_rounds_left)
-    
-    if(intensive_cylce_rounds_left == 0 and normal_cycle == False):
-        normal_cycle = True
-        intensive_cylce_rounds_left = 6
-        print("Back to normal cycle")
-
-    arena.classic()
-    if(do_tag_team_arena):
-        arena.tagTeam()
-    if(normal_cycle):
-        normalCycle()
-        print("time to sleep")
-        time.sleep(290)
-    
-    print("intensive_cylce_rounds_left ", intensive_cylce_rounds_left)
-    
-
+    print("sleep 15 min ")
+    time.sleep(900)
 
 
 
@@ -128,20 +101,7 @@ while(True):
 #   -
 # log can store to files(db) and read from files based on dates
 
-# buy items in Bazaar
-# collect gems properly
-
 # monitor server_maintenance with thred#2
 # restart app 30 min later
 
 # 12:00 CB resets, look for 
-
-
-
-# If needed some time in future:
-#time.sleep(1)
-#opengame.runopen()
-#dailylogin.collect() #2. on first run collect daily rewards
-#closeadds.closeAdds()
-#...
-# opengame.closeGame()
